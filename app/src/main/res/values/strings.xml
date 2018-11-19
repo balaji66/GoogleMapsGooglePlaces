@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GoogleMapsGooglePlaces</string>
+    <string name="map_api_key">AIzaSyCjeaySLrvETSHU22AF3ZU4n_-i3LHkvBI</string>
 </resources>
