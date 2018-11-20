@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ActivityMap">
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+    <RelativeLayout
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:elevation="10dp"
+        android:background="@drawable/white_border"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_magnify"
+            android:contentDescription="about search"
+            android:layout_width="25dp"
+            android:layout_marginStart="10dp"
+            android:layout_height="25dp" />
+        <EditText
+            android:maxLength="200"
+            android:lines="2"
+            android:maxLines="2"
+            android:inputType="text"
+            android:textSize="15sp"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/imageView"
+            android:id="@+id/editTextSearch"
+            android:textColor="#000000"
+            android:hint="Enter Address, City or Zip code"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
+</RelativeLayout>
