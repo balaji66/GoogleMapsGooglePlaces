@@ -29,7 +29,7 @@
             android:layout_width="25dp"
             android:layout_marginStart="10dp"
             android:layout_height="25dp" />
-        <EditText
+        <AutoCompleteTextView
             android:maxLength="200"
             android:lines="2"
             android:maxLines="2"
