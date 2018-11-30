@@ -42,6 +42,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -64,11 +65,12 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private static final float DEFAULT_ZOOM = 15f;
     private PlacesAutocompleteAdapter mPlacesAutocompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
-
+    private Marker mMarker;
 
     //widgets
     private AutoCompleteTextView mSearchText;
     private ImageView mGps;
+    private ImageView mInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
         mSearchText =findViewById(R.id.editTextSearch);
         mGps =findViewById(R.id.ic_gps);
+        mInfo = findViewById(R.id.place_info);
         getLocationPermission();
     }
     @Override
@@ -110,6 +113,25 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 getDeviceLocation();
+            }
+        });
+        mInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try
+                {
+                    if(mMarker.isInfoWindowShown())
+                    {
+                        mMarker.hideInfoWindow();
+                    }
+                    else{
+                        mMarker.showInfoWindow();
+                    }
+                }
+                catch (NullPointerException e)
+                {
+                    Log.e(TAG,"OnClick NullPointerException :" + e.getMessage());
+                }
             }
         });
         hideSoftKeyBoard();
@@ -177,6 +199,39 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
                     .title(title);
             mMap.addMarker(options);
         }
+        hideSoftKeyBoard();
+
+    }
+
+
+    private void moveCamera(LatLng latLng, float zoom, PlacesInfo placesInfo) {
+        Log.d(TAG, "moveCamera to last lat :" + latLng.latitude + " lng : " + latLng.longitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        mMap.clear();
+        if(placesInfo != null)
+        {
+            try
+            {
+                String snippet = "Address :" +placesInfo.getAddress() +"\n" +
+                        "Phone Number :" + placesInfo.getPhoneNumber() +"\n" +
+                        "Website :" + placesInfo.getWebSiteUri() +"\n" +
+                        "Price Rating :" + placesInfo.getRating() +"\n" ;
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .title(placesInfo.getName())
+                        .snippet(snippet);
+                mMarker = mMap.addMarker(options);
+                mMap.addMarker(options);
+            }
+            catch (NullPointerException e)
+            {
+                Log.e(TAG,"NullPointerException : " + e.getMessage());
+            }
+        }
+        else {
+            mMap.addMarker(new MarkerOptions().position(latLng));
+        }
+
         hideSoftKeyBoard();
 
     }
@@ -291,7 +346,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
                 Log.e(TAG," onResult : NullPointer Exception" +e.getMessage());
             }
 
-            moveCamera(new LatLng(place.getViewport().getCenter().latitude,place.getViewport().getCenter().longitude),DEFAULT_ZOOM,mPlace.getName());
+            moveCamera(new LatLng(place.getViewport().getCenter().latitude,place.getViewport().getCenter().longitude),DEFAULT_ZOOM,mPlace);
             places.release();
         }
     };
