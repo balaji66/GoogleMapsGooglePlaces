@@ -208,6 +208,9 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         Log.d(TAG, "moveCamera to last lat :" + latLng.latitude + " lng : " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         mMap.clear();
+
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(ActivityMap.this));
+
         if(placesInfo != null)
         {
             try
