@@ -1,6 +1,7 @@
 package com.durga.balaji66.googlemapsgoogleplaces;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -26,6 +27,8 @@ import android.widget.Toast;
 
 import com.durga.balaji66.googlemapsgoogleplaces.models.PlacesInfo;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -35,6 +38,7 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -55,6 +59,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String TAG = MainActivity.class.getName();
+    private int PLACE_PICKER_REQUEST = 1;
 
     private boolean mLocationPermissionGranted = false;
     private static final int LOCATION_REQUEST_PERMISSION_CODE = 1234;
@@ -70,7 +75,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
     //widgets
     private AutoCompleteTextView mSearchText;
     private ImageView mGps;
-    private ImageView mInfo;
+    private ImageView mInfo , mPlacePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +84,7 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
         mSearchText =findViewById(R.id.editTextSearch);
         mGps =findViewById(R.id.ic_gps);
         mInfo = findViewById(R.id.place_info);
+        mPlacePicker = findViewById(R.id.place_marker);
         getLocationPermission();
     }
     @Override
@@ -134,7 +140,32 @@ public class ActivityMap extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
+
+        mPlacePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(ActivityMap.this),PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.e(TAG,"GooglePlayServicesNotAvailableException :" + e.getMessage());
+                }
+            }
+        });
         hideSoftKeyBoard();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(requestCode == PLACE_PICKER_REQUEST)
+        {
+            Place place = PlacePicker.getPlace(this,data);
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient,place.getId());
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallBack);
+        }
     }
 
     private void geoLocate()
